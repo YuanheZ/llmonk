@@ -30,7 +30,7 @@ def run_inference(item, config: GenerateScriptConfig):
     if outpath.exists():
         return
 
-    few_shot_prompt = get_few_shot_prompt(item)
+    few_shot_prompt = "Question: Alexis is applying for a new job and bought a new set of business clothes to wear to the interview. She went to a department store with a budget of $200 and spent $30 on a button-up shirt, $46 on suit pants, $38 on a suit coat, $11 on socks, and $18 on a belt. She also purchased a pair of shoes, but lost the receipt for them. She has $16 left from her budget. How much did Alexis pay for the shoes? \n Answer:\n ## Step 1: Let S be the amount Alexis paid for the shoes.\n ## Step 2: She spent S + 30 + 46 + 38 + 11 + 18 = S + <<+30+46+38+11+18=143>>143.\n ## Step 3: She has $16 left from her budget, so S + 143 = 200 - 16 = 184.\n ## Step 4: Thus, Alexis paid S = 184 - 143 = $<<184-143=41>>41 for the shoes.\n #### 41 \n\n Question: Ken created a care package to send to his brother, who was away at boarding school.  Ken placed a box on a scale, and then he poured into the box enough jelly beans to bring the weight to 2 pounds.  Then, he added enough brownies to cause the weight to triple.  Next, he added another 2 pounds of jelly beans.  And finally, he added enough gummy worms to double the weight once again.  What was the final weight of the box of goodies, in pounds?\n Answer:\n ## Step 1: To the initial 2 pounds of jelly beans, he added enough brownies to cause the weight to triple, bringing the weight to 2*3=<<2*3=6>>6 pounds.\n ## Step 2: Next, he added another 2 pounds of jelly beans, bringing the weight to 6+2=<<6+2=8>>8 pounds.\n ## Step 3: Finally, he added enough gummy worms to double the weight once again, to a final weight of 8*2=<<8*2=16>>16 pounds.\n #### 16\n\n"
     prompt = few_shot_prompt + f"Question: {item['question']}\nAnswer:"
 
     url = f"http://localhost:{config.vllm_port}/generate"
@@ -73,7 +73,9 @@ def main(
 ):
 
     test_dataset = list(load_dataset("gsm8k", "main", split="test"))
+    test_dataset = test_dataset[:10]
     train_dataset = list(load_dataset("gsm8k", "main", split="train"))
+    train_dataset = train_dataset[:10]
 
     print(f"Number of test items: {len(test_dataset)}")
     print(f"Number of train items: {len(train_dataset)}")
